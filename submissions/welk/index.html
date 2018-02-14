@@ -1,33 +1,33 @@
 <html>
-<head>
-<title>Project 0</title>
-<style type="text/css" href="project0.css"></style>
+<head><meta charset="utf-8"></meta>
+<title>Project 1</title>
+<link rel="stylesheet" type="text/css" href="project1.css"></link>
+<!--<style type="text/css" href="project1.css"></script> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<!--Put your D3 import statement between these two lines-->
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+<!-- Put your D3 import statement between these two lines-->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
 <!--Put your D3 import statement between these two lines-->
 </head>
 
 <body>
 	<div id="partOne">
         <h1>Part One: </h1>
-        I've made a change.
 	</div>
 
-    <div id="partTwo">
+  <div id="partTwo">
         <h1>Part Two: </h1>
-        <div id="barchart">
-        </div>
-	</div>
-
-    <div id="partThree">
-        <h1>Part Three &amp; Four: </h1>
         <div id="scatterplot">
             <p id="scatterLabel"></p>
         </div>
 	</div>
 
-    <div id="partFive">
+  <div id="partThree">
+        <h1>Part Three &amp; Four: </h1>
+        <div id="linegraph">
+        </div>
+	</div>
+
+  <div id="partFive">
         <h1>Part Five: </h1>
         <div id="scatterplotSet">
         </div>
@@ -36,23 +36,180 @@
     <script type="text/javascript">
         // Put your part one code here ***********************
 
+        // First, we will create some constants to define non-data-related parts of the visualization
+        var w = 700; // Width of our visualization
+        var h = 500; // Height of our visualization
+        var xOffset = 40; // Space for x-axis labels
+        var yOffset = 100; // Space for y-axis labels
+        var margin = 10; // Margin around visualization
+        var vals = ['x', 'y']; // List of data attributes
+        var xVal = vals[0]; // Value to plot on x-axis
+        var yVal = vals[1]; // Value to plot on y-axis
 
-        // Leave this to test your data uploading. All data uploading should be above this line
-        function checkDataset(dataset) {
-            if (dataset.length == 11)
-                $("#partOne").append("<p>data loaded correctly</p>");
-            else
-                $("#partOne").append("<p>data loaded incorrectly. Try using the debugger to help you find the bug!</p>");
-        }
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 50};
+        var width = 960 - margin.left - margin.right
+        var height = 500 - margin.top - margin.bottom;
+
+        // set the ranges
+        var x = d3.scaleLinear().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
 
         // Put your part two code here ***********************
+        // append the svg obgect to the body of the page
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select("#scatterplot")
+                   .append("svg")
+                   .attr("width", width + margin.left + margin.right)
+                   .attr("height", height + margin.top + margin.bottom)
+                   .append("g")
+                   .attr("transform", "translate("+margin.left + "," + margin.top + ")");
+
+
+        // This function will test the data uploaded. All data uploading should be above this line (Danielle: Why should data uploading come before this?)
+        function checkDataset(dataset) {
+          if (dataset.length == 11)
+              $("#partOne").append("<p>data loaded correctly</p>");
+          else
+              $("#partOne").append("<p>data loaded incorrectly. Try using the debugger to help you find the bug!</p>");
+        }
+
+
+        d3.csv("data/anscombe_I.csv", function(error, data){
+          if (error) throw error;
+          data.forEach(function(d){
+              d.x = parseInt(d[xVal])
+              d.y = parseFloat(d[yVal])
+              //d.x=+d.x;
+              //d.y=+d.y;
+              //d[xVal]=+d[xVal]
+              //d[yVal]=+d[yVal]
+          })
+
+                      checkDataset(data);
+                      // Scale the range of the data
+                    x.domain(d3.extent(data, function(d) {return d[xVal];}));
+                    y.domain([0, d3.max(data, function(d) {return d[yVal];})]);
+
+                      // Add the scatterplot points
+                      svg.selectAll("circle")
+                          .data(data)
+                          .enter()
+                          .append("circle")
+                          .attr("r", 5)
+                          .attr("cx", function(d){return x(d[xVal]);})
+                          .attr("cy", function(d){return y(d[yVal]);})
+                          //.attr("fill","pink")
+                          .transition()
+                          .ease(d3.easeBounce)
+                          .duration(4000);
+                          //.attr("r", function(d){return d["y"];});
+
+                      // Add the X Axis
+                      svg.append("g")
+                        .attr("transform","translate(0, " + height +")")
+                        .call(d3.axisBottom(x));
+
+                      // Add the Y Axis
+                      svg.append("g")
+                        .call(d3.axisLeft(y));
+
+                      //Add text labels
+                        var xLabel = svg.append("text")
+                                        .attr("class", "label")
+                                        .text("X value")
+                                        .attr("x", width - 20)
+                                        .attr("y", height - 10);
+
+                        var yLabel = svg.append("text")
+                                        .attr("class", "label")
+                                        .text("Y value")
+                                        .attr("y", -10)
+                                        .attr("transform", "rotate(90)")
+                                        .style("text-anchor", "start");
+                    });
+
+
+
+
+
+
+
 
         // Put your part three & four code here ***********************
+
+
+
+
+
+        // This function will test the data uploaded. All data uploading should be above this line (Danielle: Why should data uploading come before this?)
+        function checkDataset2(dataset) {
+          if (dataset.length == 11)
+              $("#partThree").append("<p>data loaded correctly</p>");
+          else
+              $("#partThree").append("<p>data loaded incorrectly. Try using the debugger to help you find the bug!</p>");
+        }
+
+
+        d3.csv("data/anscombe_I.csv", function(error, data){
+         if (error) throw error;
+          data.forEach(function(d){
+              d.x = parseInt(d[xVal])
+              d.y = parseFloat(d[yVal])
+
+          })
+
+          var anscombedata = data;
+
+          //sort the data
+          data.sort(function(a,b){
+            return a.x - b.x
+          });
+
+          console.table(data,["x","y"]);
+
+          checkDataset2(anscombedata);
+
+          // Scale the range of the data
+          x.domain(d3.extent(data, function(d) {return d[xVal];}));
+          y.domain([0, d3.max(data, function(d) {return d[yVal];})]);
+
+         var line = d3.line()
+              .x(function(d) {return x(d.x);})
+             .y(function(d) {return y(d.y);});
+
+          var svg3 = d3.select("#linegraph")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate("+margin.left + "," + margin.top + ")");
+          //            checkDataset(data);
+//
+
+                  svg3.append("path")
+                      .datum(data)
+                      .attr("class", "line")
+                     .attr("d", line)
+
+                      // Add the X Axis
+                      svg3.append("g")
+                        .attr("transform","translate(0, " + height +")")
+                        .call(d3.axisBottom(x));
+
+                      // Add the Y Axis
+                      svg3.append("g")
+                      .call(d3.axisLeft(y));
+
+                    });
+
+
+
 
         // Put your part five code here ***********************
 
     </script>
 </body>
-
 
 </html>
